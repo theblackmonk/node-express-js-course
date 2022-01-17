@@ -1,10 +1,23 @@
+const express = require('express');
+const router = express.Router();
 let { people } = require('../data');
 
-const getPeople = (req, res) => {
-    res.status(200).json({success: true, data: people})
-}
+// www.store.com/api/orders
+// get: get all orders
+// post: place an order (send data)
 
-const createPerson  = (req, res) => {
+// www.store.com/api/orders:id
+// get: get single order
+// put: update specific order
+// delete: delete specific order
+
+router.get('/', (req, res) => {
+    res.status(200).json({success: true, data: people})
+})
+
+// got rid of /api/people as it is already in app.js
+// router.post is pushing new name in conjunction with axios
+router.post('/', (req, res) => {
     const { name } = req.body
     if (!name) {
       return res
@@ -13,9 +26,10 @@ const createPerson  = (req, res) => {
     }
     res.status(201).json({ success: true, person: name })
     // 201 code is for a successful post
-}
+  })
 
-const createPersonPostman = (req, res) => {
+// adding a name to the people object
+router.post('/postman', (req, res) => {
     const { name } = req.body
     if (!name){
         return res
@@ -23,9 +37,11 @@ const createPersonPostman = (req, res) => {
             .json({ success: false, msg: 'please provide name value'})
     }
     res.status(201).send({ succes: true, data: [...people, name] })
-}
+})
 
-const updatePerson = (req, res) => {
+
+// update specific id
+router.put('/:id', (req, res) => {
     const {id} = req.params
     const {name} = req.body
     
@@ -46,9 +62,9 @@ const updatePerson = (req, res) => {
     res.status(200).json({ success: true, data: newPeople })
     //console.log(id, name)
     //res.send('hello world')
-}
+})
 
-const deletePerson = (req, res) => {
+router.delete('/:id', (req, res) => {
     const person = people.find((person) => person.id === Number(req.params.id))
     if (!person) {
       return res
@@ -60,12 +76,7 @@ const deletePerson = (req, res) => {
       (person) => person.id !== Number(req.params.id)
     )
     return res.status(200).json({ success: true, data: newPeople })
-}
+  })
 
-module.exports = {
-    getPeople,
-    createPerson,
-    createPersonPostman,
-    updatePerson,
-    deletePerson
-}
+  
+module.exports = router
